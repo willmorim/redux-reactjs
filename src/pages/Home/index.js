@@ -6,7 +6,7 @@ import api from '../../services/api'
 
 import { ProductList } from './styles';
 
- class Home extends Component {
+class Home extends Component {
   state = {
     products: [],
   };
