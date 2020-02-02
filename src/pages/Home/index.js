@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, {useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux'
 import { MdAddShoppingCart } from 'react-icons/md'
@@ -9,31 +9,28 @@ import * as CartActions from '../../store/modules/cart/actions';
 
 import { ProductList } from './styles';
 
-class Home extends Component {
-  state = {
-    products: [],
-  };
+function Home({ amount, addToCartRequest }) {
 
-  async componentDidMount() {
-    const response = await api.get('products');
+  const [ products, setProducts ] = useState([])
 
-    const data = response.data.map(product => ({
-      ...product,
-      priceFormatted: formatPrice(product.price)
-    }))
+  useEffect(() => {
+    async function loadProducts() {
+      const response = await api.get('products');
 
-    this.setState({ products: data });
-  }
+      const data = response.data.map(product => ({
+        ...product,
+        priceFormatted: formatPrice(product.price)
+      }))
 
-  handleAddProduct = id => {
-    const { addToCartRequest } = this.props;
+      setProducts(data)
+    }
+    loadProducts();
+  }, []);
 
+  function handleAddProduct(id) {
     addToCartRequest(id);
   }
 
-  render(){
-    const { products } = this.state;
-    const { amount } = this.props;
     return (
       <ProductList>
         { products.map(product => (
@@ -47,7 +44,7 @@ class Home extends Component {
 
             <button
              type="button"
-             onClick={() => this.handleAddProduct(product.id)}
+             onClick={() => handleAddProduct(product.id)}
             >
               <div>
                 <MdAddShoppingCart size={16} color="#FFF" /> {amount[product.id] || 0}
@@ -59,7 +56,6 @@ class Home extends Component {
         ))}
     </ProductList>
     );
-  }
 }
 
 const mapStateToProps = state => ({
